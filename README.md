@@ -18,13 +18,13 @@ To install My-VMware go client, you need to install Go and set your Go workspace
 1. The first need [Go](https://golang.org/) installed (**version 1.12+ is required**), then you can use the below Go command to install Gin.
 
 ```sh
-$ go get -u github.com/adeleporte/go-my-vmware
+$ go get -u github.com/adeleporte/gomyvmware
 ```
 
 2. Import it in your code:
 
 ```go
-import "github.com/adeleporte/go-my-vmware"
+import "github.com/adeleporte/gomyvmware"
 ```
 
 
@@ -38,14 +38,20 @@ $ cat example.go
 ```go
 package main
 
+import (
+	"log"
+
+	vmw "github.com/adeleporte/gomyvmware"
+)
+
 func main() {
 
-	client, err := NewClient("test@vmware.com", "changeme")
+	client, err := vmw.NewClient("test@vmware.com", "changeme")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	results, err := GetProductsAtoZ(client)
+	results, err := vmw.GetProductsAtoZ(client)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -55,30 +61,30 @@ func main() {
 		log.Println(product.Name)
 	}
 
-	params := DLGListParams{
+	params := vmw.DLGListParams{
 		Category: "networking_security",
 		Product:  "vmware_nsx_t_data_center",
 		Version:  "3_x",
 		DlgType:  "PRODUCT_BINARY",
 	}
 
-	_, err = GetRelatedDLGList(client, params)
+	_, err = vmw.GetRelatedDLGList(client, params)
 	if err != nil {
 		log.Fatal(err)
 	}
 	//log.Printf("%+v", results2)
 
-	dlg_params := GetDLGParams{
+	dlg_params := vmw.GetDLGParams{
 		DownloadGroup: "NSX-T-30110",
 		ProductID:     982,
 	}
-	headers, err := GetDLGHeader(client, dlg_params)
+	headers, err := vmw.GetDLGHeader(client, dlg_params)
 	if err != nil {
 		log.Fatal(err)
 	}
 	//log.Printf("headers: %+v\n", headers)
 
-	details, err := GetDLGDetails(client, dlg_params)
+	details, err := vmw.GetDLGDetails(client, dlg_params)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -90,12 +96,12 @@ func main() {
 	}
 	//log.Printf("file: %+v\n", file)
 
-	_, err = GetEulaAccept(client, headers.Dlg.Code)
+	_, err = vmw.GetEulaAccept(client, headers.Dlg.Code)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	body := GetDownloadBody{
+	body := vmw.GetDownloadBody{
 		Locale:        "en_US",
 		DownloadGroup: headers.Dlg.Code,
 		ProductId:     headers.Product.ID,
@@ -108,7 +114,7 @@ func main() {
 		DlgVersion:    file.Version,
 		IsBetaFlow:    false,
 	}
-	download_link, err := GetDownload(client, body)
+	download_link, err := vmw.GetDownload(client, body)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -116,7 +122,7 @@ func main() {
 	log.Printf("File Name: %s\n", download_link.FileName)
 	//log.Printf("Download link: %s\n", download_link.DownloadURL)
 	log.Println("Downloading...")
-	Download(client, download_link)
+	vmw.Download(client, download_link)
 	log.Println("Downloaded...")
 
 }
