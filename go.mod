@@ -1,4 +1,4 @@
-module adeleporte/gomyvmware
+module github.com/adeleporte/gomyvmware
 
 go 1.15
 
